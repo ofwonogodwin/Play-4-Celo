@@ -2,6 +2,13 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+// For ES modules __dirname equivalent (if needed)
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -42,7 +49,11 @@ interface Room {
 }
 
 const rooms: Map<string, Room> = new Map();
-const questions = require('../data/questions.json');
+
+// Load questions from JSON file
+const questionsPath = path.join(__dirname, '../data/questions.json');
+const questionsData = fs.readFileSync(questionsPath, 'utf-8');
+const questions = JSON.parse(questionsData);
 
 // Helper function to calculate score
 function calculateScore(answers: Answer[]): number {

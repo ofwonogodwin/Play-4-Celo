@@ -1,11 +1,10 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { QuizPool } from "../typechain-types";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("QuizPool", function () {
-    let quizPool: QuizPool;
+    let quizPool: any;
     let mockCUSD: any;
     let admin: SignerWithAddress;
     let user1: SignerWithAddress;
