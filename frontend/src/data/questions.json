@@ -1,0 +1,404 @@
+{
+    "blockchain": [
+        {
+            "id": "b1",
+            "q": "What is cUSD?",
+            "choices": [
+                "A stablecoin on Celo",
+                "A game token",
+                "A mobile app",
+                "A wallet"
+            ],
+            "answer": 0
+        },
+        {
+            "id": "b2",
+            "q": "What is the native token of the Celo blockchain?",
+            "choices": [
+                "ETH",
+                "CELO",
+                "BTC",
+                "USDC"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "b3",
+            "q": "What is MiniPay?",
+            "choices": [
+                "A banking app",
+                "A mobile wallet for Celo",
+                "A payment gateway",
+                "A crypto exchange"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "b4",
+            "q": "Which consensus mechanism does Celo use?",
+            "choices": [
+                "Proof of Work",
+                "Proof of Stake",
+                "Delegated Proof of Stake",
+                "Proof of Authority"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "b5",
+            "q": "What is the primary goal of Celo?",
+            "choices": [
+                "Gaming",
+                "DeFi only",
+                "Financial inclusion",
+                "NFT marketplace"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "b6",
+            "q": "Which EVM-compatible blockchain is Celo?",
+            "choices": [
+                "Non-EVM",
+                "Fully EVM-compatible",
+                "Partially compatible",
+                "Fork of Bitcoin"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "b7",
+            "q": "What does 'mobile-first' mean for Celo?",
+            "choices": [
+                "No desktop support",
+                "Optimized for mobile devices",
+                "Mobile games only",
+                "SMS-based transactions"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "b8",
+            "q": "What is the Celo testnet called?",
+            "choices": [
+                "Rinkeby",
+                "Goerli",
+                "Alfajores",
+                "Ropsten"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "b9",
+            "q": "What can you use cUSD for on Celo?",
+            "choices": [
+                "Staking only",
+                "Gas fees only",
+                "Stable value transactions",
+                "Mining"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "b10",
+            "q": "Which programming language is primarily used for Celo smart contracts?",
+            "choices": [
+                "Python",
+                "JavaScript",
+                "Solidity",
+                "Rust"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "b11",
+            "q": "What is Valora?",
+            "choices": [
+                "A blockchain",
+                "A mobile wallet for Celo",
+                "A token",
+                "A consensus algorithm"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "b12",
+            "q": "What does Celo support for identity?",
+            "choices": [
+                "Email only",
+                "Phone number mapping",
+                "Social media only",
+                "No identity features"
+            ],
+            "answer": 1
+        }
+    ],
+    "football": [
+        {
+            "id": "f1",
+            "q": "Which country won the 2022 FIFA World Cup?",
+            "choices": [
+                "France",
+                "Argentina",
+                "Brazil",
+                "Germany"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "f2",
+            "q": "Who is known as 'CR7'?",
+            "choices": [
+                "Lionel Messi",
+                "Cristiano Ronaldo",
+                "Neymar Jr",
+                "Kylian Mbappé"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "f3",
+            "q": "How many players are on a football team on the field?",
+            "choices": [
+                "9",
+                "10",
+                "11",
+                "12"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "f4",
+            "q": "Which club has won the most UEFA Champions League titles?",
+            "choices": [
+                "Barcelona",
+                "Bayern Munich",
+                "AC Milan",
+                "Real Madrid"
+            ],
+            "answer": 3
+        },
+        {
+            "id": "f5",
+            "q": "What is the duration of a standard football match?",
+            "choices": [
+                "80 minutes",
+                "90 minutes",
+                "100 minutes",
+                "120 minutes"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "f6",
+            "q": "Which player has won the most Ballon d'Or awards?",
+            "choices": [
+                "Cristiano Ronaldo",
+                "Lionel Messi",
+                "Michel Platini",
+                "Johan Cruyff"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "f7",
+            "q": "What color card results in a player being sent off?",
+            "choices": [
+                "Yellow",
+                "Red",
+                "Blue",
+                "Green"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "f8",
+            "q": "Which country hosted the 2018 FIFA World Cup?",
+            "choices": [
+                "Brazil",
+                "Germany",
+                "Russia",
+                "South Africa"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "f9",
+            "q": "What is it called when a player scores three goals in one game?",
+            "choices": [
+                "Double",
+                "Triple",
+                "Hat-trick",
+                "Perfect score"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "f10",
+            "q": "Which English club is known as 'The Red Devils'?",
+            "choices": [
+                "Liverpool",
+                "Arsenal",
+                "Manchester United",
+                "Chelsea"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "f11",
+            "q": "Who is the all-time top scorer in FIFA World Cup history?",
+            "choices": [
+                "Pelé",
+                "Ronaldo Nazário",
+                "Miroslav Klose",
+                "Gerd Müller"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "f12",
+            "q": "What is the maximum number of substitutions allowed in a standard match?",
+            "choices": [
+                "3",
+                "5",
+                "7",
+                "Unlimited"
+            ],
+            "answer": 1
+        }
+    ],
+    "solidity": [
+        {
+            "id": "s1",
+            "q": "What keyword is used to declare a state variable?",
+            "choices": [
+                "var",
+                "let",
+                "uint",
+                "const"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "s2",
+            "q": "Which visibility modifier makes a function callable only within the contract?",
+            "choices": [
+                "public",
+                "external",
+                "internal",
+                "private"
+            ],
+            "answer": 3
+        },
+        {
+            "id": "s3",
+            "q": "What is the purpose of the 'payable' modifier?",
+            "choices": [
+                "Make function free",
+                "Allow receiving Ether",
+                "Increase gas limit",
+                "Make function async"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "s4",
+            "q": "Which data location is used for function parameters?",
+            "choices": [
+                "storage",
+                "memory",
+                "calldata",
+                "stack"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "s5",
+            "q": "What does 'view' function modifier mean?",
+            "choices": [
+                "Can modify state",
+                "Cannot read state",
+                "Cannot modify state",
+                "Can send Ether"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "s6",
+            "q": "Which keyword is used to inherit from another contract?",
+            "choices": [
+                "extends",
+                "inherits",
+                "is",
+                "implements"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "s7",
+            "q": "What is the correct way to declare a mapping?",
+            "choices": [
+                "map(address => uint)",
+                "mapping(address => uint)",
+                "dict(address: uint)",
+                "hashmap<address, uint>"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "s8",
+            "q": "Which special variable contains the sender's address?",
+            "choices": [
+                "tx.origin",
+                "msg.sender",
+                "block.sender",
+                "this.sender"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "s9",
+            "q": "What is the default visibility for state variables?",
+            "choices": [
+                "public",
+                "private",
+                "internal",
+                "external"
+            ],
+            "answer": 2
+        },
+        {
+            "id": "s10",
+            "q": "Which function is called when a contract receives Ether without data?",
+            "choices": [
+                "fallback()",
+                "receive()",
+                "payable()",
+                "transfer()"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "s11",
+            "q": "What is the maximum value of uint8?",
+            "choices": [
+                "128",
+                "255",
+                "256",
+                "512"
+            ],
+            "answer": 1
+        },
+        {
+            "id": "s12",
+            "q": "Which keyword is used to emit events?",
+            "choices": [
+                "trigger",
+                "fire",
+                "emit",
+                "raise"
+            ],
+            "answer": 2
+        }
+    ]
+}

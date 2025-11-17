@@ -1,0 +1,63 @@
+{
+    "name": "play-4-celo",
+    "version": "1.0.0",
+    "description": "Play-4-Celo: Mobile-first quiz and play-to-earn platform on Celo blockchain",
+    "main": "index.js",
+    "scripts": {
+        "node": "hardhat node",
+        "compile": "hardhat compile",
+        "test": "hardhat test",
+        "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
+        "deploy:alfajores": "hardhat run scripts/deploy.ts --network alfajores",
+        "payout:local": "hardhat run scripts/payoutAdmin.ts --network localhost",
+        "payout:alfajores": "hardhat run scripts/payoutAdmin.ts --network alfajores",
+        "frontend:dev": "cd frontend && npm run dev",
+        "frontend:build": "cd frontend && npm run build",
+        "frontend:install": "cd frontend && npm install",
+        "backend:dev": "cd backend && npm run dev",
+        "backend:build": "cd backend && npm run build",
+        "backend:install": "cd backend && npm install",
+        "install:all": "npm install && npm run frontend:install && npm run backend:install",
+        "start:dev": "concurrently \"npm run node\" \"npm run backend:dev\" \"npm run frontend:dev\"",
+        "lint": "eslint . --ext .ts,.tsx",
+        "clean": "rm -rf artifacts cache coverage node_modules frontend/node_modules backend/node_modules frontend/.next"
+    },
+    "keywords": [
+        "celo",
+        "blockchain",
+        "quiz",
+        "play-to-earn",
+        "minipay",
+        "hardhat",
+        "nextjs"
+    ],
+    "author": "Play-4-Celo Team",
+    "license": "MIT",
+    "devDependencies": {
+        "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
+        "@nomicfoundation/hardhat-ethers": "^3.0.4",
+        "@nomicfoundation/hardhat-network-helpers": "^1.0.9",
+        "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+        "@nomicfoundation/hardhat-verify": "^1.1.1",
+        "@typechain/ethers-v6": "^0.5.1",
+        "@typechain/hardhat": "^9.1.0",
+        "@types/chai": "^4.3.10",
+        "@types/mocha": "^10.0.4",
+        "@types/node": "^20.9.0",
+        "@typescript-eslint/eslint-plugin": "^6.11.0",
+        "@typescript-eslint/parser": "^6.11.0",
+        "chai": "^4.3.10",
+        "concurrently": "^8.2.2",
+        "eslint": "^8.53.0",
+        "ethers": "^6.8.1",
+        "hardhat": "^2.19.1",
+        "hardhat-gas-reporter": "^1.0.9",
+        "solidity-coverage": "^0.8.5",
+        "ts-node": "^10.9.1",
+        "typechain": "^8.3.2",
+        "typescript": "^5.2.2"
+    },
+    "dependencies": {
+        "dotenv": "^16.3.1"
+    }
+}
