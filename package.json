@@ -18,6 +18,7 @@
         "backend:build": "cd backend && npm run build",
         "backend:install": "cd backend && npm install",
         "install:all": "npm install && npm run frontend:install && npm run backend:install",
+        "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\" --names \"backend,frontend\" --prefix-colors \"blue,magenta\"",
         "start:dev": "concurrently \"npm run node\" \"npm run backend:dev\" \"npm run frontend:dev\"",
         "lint": "eslint . --ext .ts,.tsx",
         "clean": "rm -rf artifacts cache coverage node_modules frontend/node_modules backend/node_modules frontend/.next"
