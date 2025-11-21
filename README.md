@@ -1,4 +1,4 @@
-#  Play-4-Celo
+#  Play-4-Celo Now
 
 **A mobile-first quiz and play-to-earn platform built on Celo blockchain**
 
