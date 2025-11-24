@@ -32,7 +32,7 @@
         "hardhat",
         "nextjs"
     ],
-    "author": "Play-4-Celo Team",
+    "author": "Ofwono",
     "license": "MIT",
     "devDependencies": {
         "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
