@@ -5,32 +5,28 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Modal } from '@/components/Modal';
+import { ConnectButton, WalletStatus } from '@/components/WalletComponents';
+import { useWallet } from '@/utils/wallet';
 import toast from 'react-hot-toast';
 
 export default function Home() {
     const router = useRouter();
     const [isConnecting, setIsConnecting] = useState(false);
-    const [walletAddress, setWalletAddress] = useState<string | null>(null);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
+    
+    // Use MiniPay wallet hook
+    const { wallet, isConnected, isMiniPay, isInMiniPay, connect, disconnect, formatAddress } = useWallet();
 
-    // Mock wallet connection - replace with actual Celo wallet integration
+    // Connect to MiniPay or other Celo wallet
     const connectWallet = async () => {
         setIsConnecting(true);
         try {
-            // TODO: Implement actual Celo wallet connection
-            // For now, using mock implementation
-            if (typeof window !== 'undefined' && (window as any).ethereum) {
-                const accounts = await (window as any).ethereum.request({
-                    method: 'eth_requestAccounts',
-                });
-                setWalletAddress(accounts[0]);
-                toast.success('Wallet connected successfully!');
-            } else {
-                toast.error('Please install a Web3 wallet');
-            }
-        } catch (error) {
+            await connect();
+            const walletType = isMiniPay ? 'MiniPay' : 'Wallet';
+            toast.success(`${walletType} connected successfully! 🎉`);
+        } catch (error: any) {
             console.error('Wallet connection error:', error);
-            toast.error('Failed to connect wallet');
+            toast.error(error.message || 'Failed to connect wallet');
         } finally {
             setIsConnecting(false);
         }
@@ -61,12 +57,43 @@ export default function Home() {
     ];
 
     const handleCreateRoom = (categoryId: string) => {
-        if (!walletAddress) {
+        if (!isConnected) {
             toast.error('Please connect your wallet first');
             return;
         }
         router.push(`/room/create?category=${categoryId}`);
     };
+
+    // Get wallet status display
+    const getWalletStatus = () => {
+        if (isInMiniPay && !isConnected) {
+            return {
+                icon: '📱',
+                text: 'Connect MiniPay',
+                description: 'Tap to connect your MiniPay wallet'
+            };
+        } else if (isMiniPay && isConnected) {
+            return {
+                icon: '📱',
+                text: 'MiniPay Connected',
+                description: 'Your MiniPay wallet is connected'
+            };
+        } else if (isConnected) {
+            return {
+                icon: '🔗',
+                text: 'Wallet Connected',
+                description: 'Your Celo wallet is connected'
+            };
+        } else {
+            return {
+                icon: '🔗',
+                text: 'Connect Wallet',
+                description: 'Connect your Celo wallet to start playing'
+            };
+        }
+    };
+
+    const walletStatus = getWalletStatus();
 
     return (
         <>
@@ -91,28 +118,22 @@ export default function Home() {
                             </div>
 
                             {/* Wallet Connection */}
-                            {!walletAddress ? (
-                                <div className="flex flex-col items-center gap-4">
-                                    <Button
-                                        size="lg"
-                                        onClick={connectWallet}
-                                        isLoading={isConnecting}
-                                        className="min-w-[200px]"
-                                    >
-                                        {isConnecting ? 'Connecting...' : '🔗 Connect Wallet'}
-                                    </Button>
-                                    <p className="text-sm text-gray-500">
-                                        Connect your wallet to start playing
-                                    </p>
-                                </div>
+                            {!isConnected ? (
+                                <ConnectButton
+                                    onClick={connectWallet}
+                                    isLoading={isConnecting}
+                                    isInMiniPay={isInMiniPay}
+                                    isMiniPay={isMiniPay}
+                                />
                             ) : (
                                 <div className="space-y-4">
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-celo-green bg-opacity-10 rounded-full">
-                                        <div className="w-3 h-3 bg-celo-green rounded-full" />
-                                        <span className="text-sm font-medium text-celo-green">
-                                            {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                                        </span>
-                                    </div>
+                                    <WalletStatus
+                                        isConnected={isConnected}
+                                        address={wallet?.address}
+                                        isMiniPay={isMiniPay}
+                                        isInMiniPay={isInMiniPay}
+                                        formatAddress={formatAddress}
+                                    />
                                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                         <Button
                                             size="lg"
@@ -158,10 +179,10 @@ export default function Home() {
                         <Card padding="md" hover>
                             <div className="text-4xl mb-3">📱</div>
                             <h3 className="text-lg font-bold text-gray-900 mb-2">
-                                Mobile First
+                                MiniPay Ready
                             </h3>
                             <p className="text-sm text-gray-600">
-                                Optimized for MiniPay and mobile wallets on Celo
+                                Seamlessly integrated with MiniPay for easy mobile gaming
                             </p>
                         </Card>
                     </div>
