@@ -11,16 +11,23 @@
         "deploy:alfajores": "hardhat run scripts/deploy.ts --network alfajores",
         "payout:local": "hardhat run scripts/payoutAdmin.ts --network localhost",
         "payout:alfajores": "hardhat run scripts/payoutAdmin.ts --network alfajores",
+
         "frontend:dev": "cd frontend && npm run dev",
         "frontend:build": "cd frontend && npm run build",
         "frontend:install": "cd frontend && npm install",
+
         "backend:dev": "cd backend && npm run dev",
         "backend:build": "cd backend && npm run build",
         "backend:install": "cd backend && npm install",
+
         "install:all": "npm install && npm run frontend:install && npm run backend:install",
-        "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\" --names \"backend,frontend\" --prefix-colors \"blue,magenta\"",
-        "start:dev": "concurrently \"npm run node\" \"npm run backend:dev\" \"npm run frontend:dev\"",
+
+        "dev": "concurrently -k --names \"backend,frontend\" --prefix-colors \"blue,magenta\" \"npm run backend:dev\" \"npm run frontend:dev\"",
+
+        "start:dev": "concurrently -k \"npm run node\" \"npm run backend:dev\" \"npm run frontend:dev\"",
+
         "lint": "eslint . --ext .ts,.tsx",
+
         "clean": "rm -rf artifacts cache coverage node_modules frontend/node_modules backend/node_modules frontend/.next"
     },
     "keywords": [
