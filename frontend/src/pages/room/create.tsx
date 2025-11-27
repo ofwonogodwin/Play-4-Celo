@@ -23,7 +23,7 @@ export default function CreateRoom() {
     const router = useRouter();
     const { category } = router.query;
     const { wallet, isConnected } = useWallet();
-    
+
     const [isCreating, setIsCreating] = useState(false);
     const [roomName, setRoomName] = useState('');
     const [maxPlayers, setMaxPlayers] = useState(4);
@@ -65,7 +65,7 @@ export default function CreateRoom() {
                     name: roomName,
                     maxPlayers,
                     entryFee,
-                    creator: wallet?.address,
+                    hostAddress: wallet?.address,
                 }),
             });
 
@@ -75,7 +75,7 @@ export default function CreateRoom() {
 
             const room: Room = await response.json();
             toast.success('Room created successfully! 🎉');
-            
+
             // Redirect to the room
             router.push(`/room/${room.id}`);
         } catch (error: any) {

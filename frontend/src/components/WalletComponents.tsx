@@ -30,12 +30,12 @@ interface WalletStatusProps {
     formatAddress: (address: string) => string;
 }
 
-export function WalletStatus({ 
-    isConnected, 
-    address, 
-    isMiniPay, 
-    isInMiniPay, 
-    formatAddress 
+export function WalletStatus({
+    isConnected,
+    address,
+    isMiniPay,
+    isInMiniPay,
+    formatAddress
 }: WalletStatusProps) {
     if (!isConnected || !address) return null;
 
@@ -65,12 +65,12 @@ interface ConnectButtonProps {
     className?: string;
 }
 
-export function ConnectButton({ 
-    onClick, 
-    isLoading, 
-    isInMiniPay, 
-    isMiniPay, 
-    className = '' 
+export function ConnectButton({
+    onClick,
+    isLoading,
+    isInMiniPay,
+    isMiniPay,
+    className = ''
 }: ConnectButtonProps) {
     const getButtonText = () => {
         if (isLoading) return 'Connecting...';
@@ -91,8 +91,8 @@ export function ConnectButton({
                 disabled={isLoading}
                 className={`
                     min-w-[200px] px-6 py-3 rounded-lg font-semibold text-white
-                    ${isInMiniPay || isMiniPay 
-                        ? 'bg-blue-600 hover:bg-blue-700' 
+                    ${isInMiniPay || isMiniPay
+                        ? 'bg-blue-600 hover:bg-blue-700'
                         : 'bg-celo-green hover:bg-celo-jade'
                     }
                     disabled:opacity-50 disabled:cursor-not-allowed
@@ -106,8 +106,8 @@ export function ConnectButton({
                 {getDescription()}
             </p>
             {isInMiniPay && (
-                <MiniPayBadge 
-                    isInMiniPay={isInMiniPay} 
+                <MiniPayBadge
+                    isInMiniPay={isInMiniPay}
                     isMiniPay={isMiniPay}
                     className="bg-blue-50 border border-blue-200"
                 />

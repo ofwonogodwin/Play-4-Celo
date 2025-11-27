@@ -22,6 +22,8 @@ interface Player {
     score: number;
     answers: number[];
     timeTaken: number[];
+    correctAnswers: number;
+    timeBonus: number;
 }
 
 interface Room {
@@ -54,14 +56,14 @@ export default function GameRoom() {
     // Fetch room data
     const fetchRoom = useCallback(async () => {
         if (!roomId) return;
-        
+
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rooms/${roomId}`);
             if (!response.ok) throw new Error('Room not found');
-            
+
             const roomData: Room = await response.json();
             setRoom(roomData);
-            
+
             if (roomData.status === 'active' && !gameStarted) {
                 setGameStarted(true);
                 setTimeLeft(30);
@@ -151,7 +153,7 @@ export default function GameRoom() {
             }
 
             const result = await response.json();
-            
+
             if (answerIndex >= 0) {
                 if (result.correct) {
                     toast.success(`Correct! +${result.points} points 🎉`);
@@ -254,11 +256,11 @@ export default function GameRoom() {
                                 <span className={`
                                     px-3 py-1 rounded-full text-sm font-medium
                                     ${room.status === 'waiting' ? 'bg-yellow-100 text-yellow-800' :
-                                      room.status === 'active' ? 'bg-green-100 text-green-800' :
-                                      'bg-gray-100 text-gray-800'}
+                                        room.status === 'active' ? 'bg-green-100 text-green-800' :
+                                            'bg-gray-100 text-gray-800'}
                                 `}>
                                     {room.status === 'waiting' ? '⏳ Waiting' :
-                                     room.status === 'active' ? '🔥 Active' : '✅ Completed'}
+                                        room.status === 'active' ? '🔥 Active' : '✅ Completed'}
                                 </span>
                                 <span className="text-sm text-gray-600">
                                     Players: {room.players.length}/{room.maxPlayers}
@@ -330,7 +332,18 @@ export default function GameRoom() {
                             <Card padding="lg">
                                 <div className="text-center space-y-6">
                                     <div className="flex items-center justify-center gap-4">
-                                        <Timer timeLeft={timeLeft} totalTime={30} />
+                                        {/* Custom Timer Display */}
+                                        <div className="flex flex-col items-center">
+                                            <div className={`
+                                                w-16 h-16 rounded-full border-4 flex items-center justify-center text-xl font-bold
+                                                ${timeLeft > 10 ? 'border-celo-green text-celo-green' :
+                                                    timeLeft > 5 ? 'border-yellow-500 text-yellow-500' :
+                                                        'border-red-500 text-red-500'}
+                                            `}>
+                                                {timeLeft}
+                                            </div>
+                                            <div className="text-xs text-gray-500 mt-1">seconds</div>
+                                        </div>
                                         <div className="text-lg font-bold text-gray-900">
                                             Question {room.currentQuestion + 1} of {room.questions.length}
                                         </div>
@@ -355,11 +368,11 @@ export default function GameRoom() {
                                                         p-4 rounded-lg border-2 text-left transition-all
                                                         ${!showResult ? (
                                                             isSelected ? 'border-celo-green bg-celo-green bg-opacity-10' :
-                                                            'border-gray-200 hover:border-celo-green hover:bg-gray-50'
+                                                                'border-gray-200 hover:border-celo-green hover:bg-gray-50'
                                                         ) : (
                                                             isCorrect ? 'border-green-500 bg-green-50' :
-                                                            isSelected && !isCorrect ? 'border-red-500 bg-red-50' :
-                                                            'border-gray-200 bg-gray-50'
+                                                                isSelected && !isCorrect ? 'border-red-500 bg-red-50' :
+                                                                    'border-gray-200 bg-gray-50'
                                                         )}
                                                         disabled:opacity-50 disabled:cursor-not-allowed
                                                     `}
@@ -368,9 +381,9 @@ export default function GameRoom() {
                                                         <div className={`
                                                             w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm font-bold
                                                             ${!showResult ? 'border-gray-400 text-gray-400' :
-                                                              isCorrect ? 'border-green-500 bg-green-500 text-white' :
-                                                              isSelected && !isCorrect ? 'border-red-500 bg-red-500 text-white' :
-                                                              'border-gray-400 text-gray-400'}
+                                                                isCorrect ? 'border-green-500 bg-green-500 text-white' :
+                                                                    isSelected && !isCorrect ? 'border-red-500 bg-red-500 text-white' :
+                                                                        'border-gray-400 text-gray-400'}
                                                         `}>
                                                             {String.fromCharCode(65 + index)}
                                                         </div>
@@ -388,7 +401,7 @@ export default function GameRoom() {
                                     {hasAnswered && (
                                         <div className="text-center">
                                             <p className="text-gray-600">
-                                                {selectedAnswer === currentQuestion.correctAnswer ? 
+                                                {selectedAnswer === currentQuestion.correctAnswer ?
                                                     '🎉 Correct!' : '😔 Incorrect'
                                                 }
                                             </p>
@@ -401,7 +414,7 @@ export default function GameRoom() {
                             </Card>
 
                             {/* Scoreboard */}
-                            <Scoreboard players={room.players} currentPlayer={wallet?.address} />
+                            <Scoreboard players={room.players} currentUserAddress={wallet?.address} />
                         </>
                     )}
 
@@ -416,10 +429,11 @@ export default function GameRoom() {
                                 </div>
                             </Card>
 
-                            <Scoreboard 
-                                players={room.players} 
-                                currentPlayer={wallet?.address}
-                                showFinal={true}
+                            <Scoreboard
+                                players={room.players}
+                                currentUserAddress={wallet?.address}
+                                showPrizes={true}
+                                prizes={[100, 50, 25]}
                             />
                         </>
                     )}

@@ -56,7 +56,7 @@ export class WalletService {
     // Check if MiniPay is available
     isMiniPayAvailable(): boolean {
         if (typeof window === 'undefined') return false;
-        
+
         // MiniPay injects ethereum provider with specific properties
         const { ethereum } = window;
         if (!ethereum) return false;
@@ -72,10 +72,10 @@ export class WalletService {
     // Check if running inside MiniPay
     isInMiniPay(): boolean {
         if (typeof window === 'undefined') return false;
-        
+
         const userAgent = navigator.userAgent.toLowerCase();
-        return userAgent.includes('minipay') || 
-               userAgent.includes('opera') && userAgent.includes('mobile');
+        return userAgent.includes('minipay') ||
+            userAgent.includes('opera') && userAgent.includes('mobile');
     }
 
     // Get the best available wallet provider

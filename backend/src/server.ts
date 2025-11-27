@@ -111,13 +111,13 @@ app.post('/api/rooms/create', (req: Request, res: Response) => {
     }
 
     const roomId = uuidv4().substring(0, 8).toUpperCase();
-    
+
     // Get questions for the category
     const categoryQuestions = questions[category] || [];
     if (categoryQuestions.length < 10) {
         return res.status(400).json({ error: 'Not enough questions for this category' });
     }
-    
+
     // Shuffle and select 10 questions
     const selectedQuestions = [...categoryQuestions]
         .sort(() => 0.5 - Math.random())
@@ -211,7 +211,7 @@ app.post('/api/rooms/:roomId/join', (req: Request, res: Response) => {
 
     room.players.push(player);
     rooms.set(roomId, room);
-    
+
     console.log(`Player ${playerAddress} joined room ${roomId}`);
     res.json({ room, message: 'Successfully joined room' });
 });
@@ -286,7 +286,7 @@ app.post('/api/answers/submit', (req: Request, res: Response) => {
 
     // Calculate if answer is correct
     const isCorrect = answerIndex >= 0 && answerIndex === question.correctAnswer;
-    
+
     // Calculate points (base 100 + time bonus)
     let points = 0;
     if (isCorrect) {
@@ -317,9 +317,9 @@ app.post('/api/answers/submit', (req: Request, res: Response) => {
     rooms.set(roomId, room);
 
     console.log(`Answer submitted: Room ${roomId}, Player ${playerAddress}, Q${questionIndex}, Correct: ${isCorrect}, Points: ${points}`);
-    
-    res.json({ 
-        correct: isCorrect, 
+
+    res.json({
+        correct: isCorrect,
         points,
         playerScore: player.score,
         correctAnswer: question.correctAnswer

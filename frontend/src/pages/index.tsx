@@ -13,7 +13,7 @@ export default function Home() {
     const router = useRouter();
     const [isConnecting, setIsConnecting] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
-    
+
     // Use MiniPay wallet hook
     const { wallet, isConnected, isMiniPay, isInMiniPay, connect, disconnect, formatAddress } = useWallet();
 

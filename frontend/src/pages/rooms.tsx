@@ -40,7 +40,7 @@ export default function Rooms() {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rooms`);
             if (!response.ok) throw new Error('Failed to fetch rooms');
-            
+
             const data = await response.json();
             setRooms(data.rooms || []);
         } catch (error) {
@@ -181,9 +181,9 @@ export default function Rooms() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {rooms.map((room) => {
                                     const categoryInfo = getCategoryInfo(room.category);
-                                    const canJoin = room.status === 'waiting' && 
-                                                   room.players.length < room.maxPlayers &&
-                                                   !room.players.includes(wallet?.address || '');
+                                    const canJoin = room.status === 'waiting' &&
+                                        room.players.length < room.maxPlayers &&
+                                        !room.players.includes(wallet?.address || '');
 
                                     return (
                                         <Card key={room.id} padding="md" hover={canJoin}>
@@ -206,8 +206,8 @@ export default function Rooms() {
                                                     <span className={`
                                                         px-2 py-1 rounded-full text-xs font-medium
                                                         ${room.status === 'waiting' ? 'bg-green-100 text-green-800' :
-                                                          room.status === 'active' ? 'bg-blue-100 text-blue-800' :
-                                                          'bg-gray-100 text-gray-800'}
+                                                            room.status === 'active' ? 'bg-blue-100 text-blue-800' :
+                                                                'bg-gray-100 text-gray-800'}
                                                     `}>
                                                         {room.status}
                                                     </span>
@@ -256,10 +256,10 @@ export default function Rooms() {
                                                     variant={canJoin ? 'primary' : 'outline'}
                                                 >
                                                     {joiningRoom === room.id ? 'Joining...' :
-                                                     canJoin ? '🚀 Join Room' :
-                                                     room.status === 'active' ? '👀 Watch Game' :
-                                                     room.players.includes(wallet?.address || '') ? '↩️ Return to Room' :
-                                                     '❌ Room Full'}
+                                                        canJoin ? '🚀 Join Room' :
+                                                            room.status === 'active' ? '👀 Watch Game' :
+                                                                room.players.includes(wallet?.address || '') ? '↩️ Return to Room' :
+                                                                    '❌ Room Full'}
                                                 </Button>
                                             </div>
                                         </Card>
