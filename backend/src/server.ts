@@ -26,29 +26,37 @@ interface Player {
     correctAnswers: number;
     timeBonus: number;
     answers: Answer[];
+    joinedAt: Date;
 }
 
 interface Answer {
     questionId: string;
+    questionIndex: number;
     selectedAnswer: number;
     timeSpent: number;
     isCorrect: boolean;
+    points: number;
 }
 
 interface Room {
     id: string;
+    name: string;
     hostAddress: string;
     category: string;
     entryFee: number;
     players: Player[];
     status: 'waiting' | 'playing' | 'finished';
     questions: any[];
+    currentQuestion: number;
+    maxPlayers: number;
+    creator: string;
     createdAt: Date;
     startedAt?: Date;
     finishedAt?: Date;
 }
 
 const rooms: Map<string, Room> = new Map();
+const gameTimers: Map<string, NodeJS.Timeout> = new Map();
 
 // Load questions from JSON file
 const questionsPath = path.join(__dirname, '../data/questions.json');
@@ -95,28 +103,51 @@ app.get('/api/questions/:category', (req: Request, res: Response) => {
 });
 
 // Create a new room
-app.post('/api/rooms', (req: Request, res: Response) => {
-    const { hostAddress, category, entryFee = 0 } = req.body;
+app.post('/api/rooms/create', (req: Request, res: Response) => {
+    const { hostAddress, category, entryFee = 0, name, maxPlayers = 4 } = req.body;
 
-    if (!hostAddress || !category) {
+    if (!hostAddress || !category || !name) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const roomId = uuidv4();
+    const roomId = uuidv4().substring(0, 8).toUpperCase();
+    
+    // Get questions for the category
+    const categoryQuestions = questions[category] || [];
+    if (categoryQuestions.length < 10) {
+        return res.status(400).json({ error: 'Not enough questions for this category' });
+    }
+    
+    // Shuffle and select 10 questions
+    const selectedQuestions = [...categoryQuestions]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 10);
+
     const room: Room = {
         id: roomId,
+        name: name,
         hostAddress,
         category,
-        entryFee,
-        players: [],
+        entryFee: parseFloat(entryFee),
+        players: [{
+            address: hostAddress,
+            score: 0,
+            correctAnswers: 0,
+            timeBonus: 0,
+            answers: [],
+            joinedAt: new Date()
+        }],
         status: 'waiting',
-        questions: [],
+        questions: selectedQuestions,
+        currentQuestion: 0,
+        maxPlayers: parseInt(maxPlayers),
+        creator: hostAddress,
         createdAt: new Date(),
     };
 
     rooms.set(roomId, room);
-
-    res.json({ room });
+    console.log(`Room created: ${roomId} (${name}) by ${hostAddress}`);
+    res.json(room);
 });
 
 // Get room details
@@ -143,10 +174,10 @@ app.get('/api/rooms', (req: Request, res: Response) => {
 // Join a room
 app.post('/api/rooms/:roomId/join', (req: Request, res: Response) => {
     const { roomId } = req.params;
-    const { address } = req.body;
+    const { playerAddress } = req.body;
 
-    if (!address) {
-        return res.status(400).json({ error: 'Address is required' });
+    if (!playerAddress) {
+        return res.status(400).json({ error: 'Player address is required' });
     }
 
     const room = rooms.get(roomId);
@@ -159,30 +190,36 @@ app.post('/api/rooms/:roomId/join', (req: Request, res: Response) => {
         return res.status(400).json({ error: 'Room is not accepting players' });
     }
 
+    if (room.players.length >= room.maxPlayers) {
+        return res.status(400).json({ error: 'Room is full' });
+    }
+
     // Check if player already joined
-    const existingPlayer = room.players.find((p) => p.address === address);
+    const existingPlayer = room.players.find((p) => p.address === playerAddress);
     if (existingPlayer) {
         return res.status(400).json({ error: 'Already joined this room' });
     }
 
     const player: Player = {
-        address,
+        address: playerAddress,
         score: 0,
         correctAnswers: 0,
         timeBonus: 0,
         answers: [],
+        joinedAt: new Date()
     };
 
     room.players.push(player);
     rooms.set(roomId, room);
-
-    res.json({ room });
+    
+    console.log(`Player ${playerAddress} joined room ${roomId}`);
+    res.json({ room, message: 'Successfully joined room' });
 });
 
 // Start a game
 app.post('/api/rooms/:roomId/start', (req: Request, res: Response) => {
     const { roomId } = req.params;
-    const { hostAddress } = req.body;
+    const { playerAddress } = req.body;
 
     const room = rooms.get(roomId);
 
@@ -190,37 +227,33 @@ app.post('/api/rooms/:roomId/start', (req: Request, res: Response) => {
         return res.status(404).json({ error: 'Room not found' });
     }
 
-    if (room.hostAddress !== hostAddress) {
+    if (room.hostAddress !== playerAddress && room.creator !== playerAddress) {
         return res.status(403).json({ error: 'Only host can start the game' });
     }
 
-    if (room.players.length < 1) {
-        return res.status(400).json({ error: 'Need at least 1 player to start' });
+    if (room.players.length < 2) {
+        return res.status(400).json({ error: 'Need at least 2 players to start' });
     }
 
-    // Get questions for the category
-    const categoryQuestions = questions[room.category];
-    if (!categoryQuestions) {
-        return res.status(400).json({ error: 'Invalid category' });
+    if (room.status !== 'waiting') {
+        return res.status(400).json({ error: 'Game already started or finished' });
     }
 
-    // Shuffle and select 10 questions
-    const shuffled = [...categoryQuestions].sort(() => Math.random() - 0.5);
-    room.questions = shuffled.slice(0, 10);
+    // Start the game
     room.status = 'playing';
     room.startedAt = new Date();
 
     rooms.set(roomId, room);
+    console.log(`Game started in room ${roomId} by ${playerAddress}`);
 
-    res.json({ room, questions: room.questions });
+    res.json({ room, message: 'Game started successfully' });
 });
 
 // Submit answers
-app.post('/api/rooms/:roomId/submit', (req: Request, res: Response) => {
-    const { roomId } = req.params;
-    const { address, answers } = req.body;
+app.post('/api/answers/submit', (req: Request, res: Response) => {
+    const { roomId, playerAddress, questionIndex, answerIndex, timeTaken } = req.body;
 
-    if (!address || !answers) {
+    if (!roomId || !playerAddress || questionIndex === undefined || answerIndex === undefined) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -230,36 +263,67 @@ app.post('/api/rooms/:roomId/submit', (req: Request, res: Response) => {
         return res.status(404).json({ error: 'Room not found' });
     }
 
-    const player = room.players.find((p) => p.address === address);
+    if (room.status !== 'playing') {
+        return res.status(400).json({ error: 'Game is not active' });
+    }
+
+    const player = room.players.find((p) => p.address === playerAddress);
 
     if (!player) {
         return res.status(404).json({ error: 'Player not found in this room' });
     }
 
-    // Process answers
-    const processedAnswers: Answer[] = answers.map((ans: any) => {
-        const question = room.questions.find((q) => q.id === ans.questionId);
-        const isCorrect = question && question.answer === ans.selectedAnswer;
+    const question = room.questions[questionIndex];
+    if (!question) {
+        return res.status(400).json({ error: 'Invalid question index' });
+    }
 
-        return {
-            questionId: ans.questionId,
-            selectedAnswer: ans.selectedAnswer,
-            timeSpent: ans.timeSpent,
-            isCorrect,
-        };
-    });
+    // Check if already answered this question
+    const existingAnswer = player.answers.find(a => a.questionIndex === questionIndex);
+    if (existingAnswer) {
+        return res.status(400).json({ error: 'Already answered this question' });
+    }
 
-    player.answers = processedAnswers;
-    player.correctAnswers = processedAnswers.filter((a) => a.isCorrect).length;
-    player.score = calculateScore(processedAnswers);
-    player.timeBonus = processedAnswers.reduce(
-        (sum, a) => sum + (a.isCorrect ? Math.max(0, 50 - Math.floor(a.timeSpent / 60)) : 0),
-        0
-    );
+    // Calculate if answer is correct
+    const isCorrect = answerIndex >= 0 && answerIndex === question.correctAnswer;
+    
+    // Calculate points (base 100 + time bonus)
+    let points = 0;
+    if (isCorrect) {
+        points = 100;
+        // Time bonus: max 50 points for quick answers (30s max, give bonus for <10s)
+        if (timeTaken < 10) {
+            points += Math.max(0, 50 - timeTaken * 5);
+        }
+    }
 
+    const answer: Answer = {
+        questionId: question.id || `q${questionIndex}`,
+        questionIndex,
+        selectedAnswer: answerIndex,
+        timeSpent: timeTaken || 30,
+        isCorrect,
+        points
+    };
+
+    // Update player stats
+    player.answers.push(answer);
+    player.score += points;
+    if (isCorrect) {
+        player.correctAnswers += 1;
+    }
+
+    // Update room
     rooms.set(roomId, room);
 
-    res.json({ player });
+    console.log(`Answer submitted: Room ${roomId}, Player ${playerAddress}, Q${questionIndex}, Correct: ${isCorrect}, Points: ${points}`);
+    
+    res.json({ 
+        correct: isCorrect, 
+        points,
+        playerScore: player.score,
+        correctAnswer: question.correctAnswer
+    });
 });
 
 // Finish game and calculate winners
