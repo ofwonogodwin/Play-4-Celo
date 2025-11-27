@@ -106,10 +106,9 @@ export default function Home() {
                     {/* Hero Section */}
                     <Card padding="lg">
                         <div className="text-center space-y-6">
-                            <div className="text-6xl sm:text-8xl">🎮</div>
                             <div>
                                 <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-3">
-                                    Welcome to Play-4-Celo
+                                    Play-4-Celo
                                 </h1>
                                 <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
                                     Test your knowledge, compete with others, and earn cUSD rewards on
@@ -185,53 +184,6 @@ export default function Home() {
                                 Seamlessly integrated with MiniPay for easy mobile gaming
                             </p>
                         </Card>
-                    </div>
-
-                    {/* How It Works */}
-                    <Card padding="lg">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                            How It Works
-                        </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[
-                                { step: 1, title: 'Connect Wallet', icon: '🔗' },
-                                { step: 2, title: 'Choose Category', icon: '🎯' },
-                                { step: 3, title: 'Play Quiz', icon: '🎮' },
-                                { step: 4, title: 'Earn Rewards', icon: '💎' },
-                            ].map((item) => (
-                                <div key={item.step} className="text-center">
-                                    <div className="text-5xl mb-3">{item.icon}</div>
-                                    <div className="text-sm font-semibold text-celo-green mb-1">
-                                        Step {item.step}
-                                    </div>
-                                    <div className="text-base font-medium text-gray-900">
-                                        {item.title}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </Card>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        {[
-                            { label: 'Total Players', value: '1,234', icon: '👥' },
-                            { label: 'Rewards Paid', value: '5,678 cUSD', icon: '💵' },
-                            { label: 'Games Played', value: '9,012', icon: '🎮' },
-                            { label: 'Active Rooms', value: '34', icon: '🔥' },
-                        ].map((stat) => (
-                            <Card key={stat.label} padding="md">
-                                <div className="text-center">
-                                    <div className="text-3xl mb-2">{stat.icon}</div>
-                                    <div className="text-xl sm:text-2xl font-bold text-gray-900">
-                                        {stat.value}
-                                    </div>
-                                    <div className="text-xs sm:text-sm text-gray-600">
-                                        {stat.label}
-                                    </div>
-                                </div>
-                            </Card>
-                        ))}
                     </div>
                 </div>
 

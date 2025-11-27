@@ -9,23 +9,23 @@ import toast from 'react-hot-toast';
 
 interface Room {
     id: string;
-    category: string;
     name: string;
+    category: string;
+    entryFee: number;
     maxPlayers: number;
-    entryFee: string;
-    prizePool: string;
-    creator: string;
-    status: 'waiting' | 'active' | 'completed';
-    players: string[];
+    currentPlayers: number;
+    status: 'waiting' | 'active' | 'finished';
+    createdAt: string;
+    questionCount: number;
+    timePerQuestion: number;
 }
 
-export default function Rooms() {
+export default function RoomsPage() {
     const router = useRouter();
-    const { wallet, isConnected, formatAddress } = useWallet();
+    const { isConnected } = useWallet();
     const [rooms, setRooms] = useState<Room[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [joinCode, setJoinCode] = useState('');
-    const [joiningRoom, setJoiningRoom] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     useEffect(() => {
         if (!isConnected) {
@@ -33,251 +33,231 @@ export default function Rooms() {
             router.push('/');
             return;
         }
+
         fetchRooms();
-    }, [isConnected, router]);
+        const interval = setInterval(fetchRooms, 5000); // Poll every 5 seconds
+        return () => clearInterval(interval);
+    }, [isConnected]);
 
     const fetchRooms = async () => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rooms`);
-            if (!response.ok) throw new Error('Failed to fetch rooms');
-
             const data = await response.json();
             setRooms(data.rooms || []);
         } catch (error) {
-            console.error('Fetch rooms error:', error);
+            console.error('Failed to fetch rooms:', error);
             toast.error('Failed to load rooms');
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
-    const joinRoom = async (roomId: string) => {
-        setJoiningRoom(roomId);
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rooms/${roomId}/join`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    playerAddress: wallet?.address,
-                }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Failed to join room');
-            }
-
-            toast.success('Joined room successfully! 🎉');
-            router.push(`/room/${roomId}`);
-        } catch (error: any) {
-            console.error('Join room error:', error);
-            toast.error(error.message || 'Failed to join room');
-        } finally {
-            setJoiningRoom(null);
-        }
+    const categories = {
+        all: { name: 'All Categories', icon: '🎮', color: 'bg-gray-500' },
+        blockchain: { name: 'Blockchain & Celo', icon: '⛓️', color: 'bg-blue-500' },
+        football: { name: 'Football', icon: '⚽', color: 'bg-green-500' },
+        solidity: { name: 'Smart Contracts', icon: '📝', color: 'bg-purple-500' },
     };
 
-    const joinByCode = async () => {
-        if (!joinCode.trim()) {
-            toast.error('Please enter a room code');
-            return;
-        }
-        await joinRoom(joinCode.trim());
-        setJoinCode('');
+    const filteredRooms = selectedCategory === 'all'
+        ? rooms
+        : rooms.filter(room => room.category === selectedCategory);
+
+    const joinRoom = (roomId: string) => {
+        router.push(`/room/${roomId}`);
     };
 
-    const getCategoryInfo = (category: string) => {
-        const categories: Record<string, any> = {
-            blockchain: { name: 'Blockchain & Celo', icon: '⛓️', color: 'bg-blue-500' },
-            football: { name: 'Football', icon: '⚽', color: 'bg-green-500' },
-            solidity: { name: 'Smart Contracts', icon: '📝', color: 'bg-purple-500' },
-        };
-        return categories[category] || { name: 'Unknown', icon: '❓', color: 'bg-gray-500' };
-    };
-
-    if (!isConnected) return null;
+    if (!isConnected) {
+        return null;
+    }
 
     return (
         <>
             <Head>
-                <title>Join Rooms - Play-4-Celo</title>
+                <title>Browse Rooms | Play-4-Celo</title>
             </Head>
 
             <Layout>
                 <div className="space-y-6">
                     {/* Header */}
                     <Card padding="lg">
-                        <div className="text-center space-y-4">
-                            <div className="text-6xl">🔍</div>
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">
-                                    Join a Game Room
-                                </h1>
-                                <p className="text-gray-600">
-                                    Find an active room or enter a room code to join
-                                </p>
+                                <h1 className="text-2xl font-bold text-gray-900">Browse Rooms</h1>
+                                <p className="text-gray-600">Find and join active quiz rooms</p>
+                            </div>
+                            <Button onClick={() => router.push('/')}>
+                                🎯 Create New Room
+                            </Button>
+                        </div>
+                    </Card>
+
+                    {/* Category Filter */}
+                    <Card padding="md">
+                        <div className="flex flex-wrap gap-3">
+                            {Object.entries(categories).map(([key, category]) => (
+                                <button
+                                    key={key}
+                                    onClick={() => setSelectedCategory(key)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${selectedCategory === key
+                                            ? `${category.color} border-transparent text-white`
+                                            : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                                        }`}
+                                >
+                                    <span>{category.icon}</span>
+                                    <span className="font-medium">{category.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </Card>
+
+                    {/* Rooms List */}
+                    {isLoading ? (
+                        <div className="flex items-center justify-center min-h-[300px]">
+                            <div className="text-center">
+                                <div className="text-4xl mb-4">🎮</div>
+                                <p className="text-gray-600">Loading rooms...</p>
                             </div>
                         </div>
-                    </Card>
-
-                    {/* Quick Join */}
-                    <Card padding="lg">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">🚀 Quick Join</h3>
-                        <div className="flex gap-3">
-                            <input
-                                type="text"
-                                value={joinCode}
-                                onChange={(e) => setJoinCode(e.target.value)}
-                                placeholder="Enter room code..."
-                                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-celo-green focus:border-transparent"
-                                onKeyPress={(e) => e.key === 'Enter' && joinByCode()}
-                            />
-                            <Button
-                                onClick={joinByCode}
-                                isLoading={joiningRoom === joinCode}
-                            >
-                                Join
-                            </Button>
-                        </div>
-                    </Card>
-
-                    {/* Available Rooms */}
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900">🏠 Available Rooms</h3>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={fetchRooms}
-                                isLoading={loading}
-                            >
-                                🔄 Refresh
-                            </Button>
-                        </div>
-
-                        {loading ? (
-                            <Card padding="lg">
-                                <div className="text-center py-8">
-                                    <div className="animate-spin text-4xl mb-4">⚡</div>
-                                    <p className="text-gray-600">Loading rooms...</p>
-                                </div>
-                            </Card>
-                        ) : rooms.length === 0 ? (
-                            <Card padding="lg">
-                                <div className="text-center py-8">
-                                    <div className="text-4xl mb-4">🏜️</div>
-                                    <p className="text-gray-600 mb-4">No active rooms found</p>
-                                    <Button
-                                        onClick={() => router.push('/')}
-                                        variant="outline"
-                                    >
-                                        Create a Room
+                    ) : filteredRooms.length === 0 ? (
+                        <Card padding="lg">
+                            <div className="text-center space-y-4">
+                                <div className="text-6xl">😔</div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                        No rooms found
+                                    </h3>
+                                    <p className="text-gray-600 mb-4">
+                                        {selectedCategory === 'all'
+                                            ? 'No active rooms available. Be the first to create one!'
+                                            : `No ${categories[selectedCategory as keyof typeof categories].name.toLowerCase()} rooms available.`
+                                        }
+                                    </p>
+                                    <Button onClick={() => router.push('/')}>
+                                        🎯 Create First Room
                                     </Button>
                                 </div>
-                            </Card>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {rooms.map((room) => {
-                                    const categoryInfo = getCategoryInfo(room.category);
-                                    const canJoin = room.status === 'waiting' &&
-                                        room.players.length < room.maxPlayers &&
-                                        !room.players.includes(wallet?.address || '');
+                            </div>
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {filteredRooms.map((room) => {
+                                const category = categories[room.category as keyof typeof categories] || categories.all;
+                                const isJoinable = room.status === 'waiting' && room.currentPlayers < room.maxPlayers;
 
-                                    return (
-                                        <Card key={room.id} padding="md" hover={canJoin}>
-                                            <div className="space-y-4">
-                                                {/* Room Header */}
-                                                <div className="flex items-start justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`text-2xl p-2 rounded-lg ${categoryInfo.color} bg-opacity-10`}>
-                                                            {categoryInfo.icon}
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="font-bold text-gray-900">
-                                                                {room.name}
-                                                            </h4>
-                                                            <p className="text-sm text-gray-600">
-                                                                {categoryInfo.name}
-                                                            </p>
-                                                        </div>
+                                return (
+                                    <Card key={room.id} padding="md" hover>
+                                        <div className="space-y-4">
+                                            {/* Room Header */}
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`p-2 rounded-lg ${category.color} bg-opacity-10`}>
+                                                        <span className="text-xl">{category.icon}</span>
                                                     </div>
-                                                    <span className={`
-                                                        px-2 py-1 rounded-full text-xs font-medium
-                                                        ${room.status === 'waiting' ? 'bg-green-100 text-green-800' :
-                                                            room.status === 'active' ? 'bg-blue-100 text-blue-800' :
-                                                                'bg-gray-100 text-gray-800'}
-                                                    `}>
-                                                        {room.status}
+                                                    <div>
+                                                        <h3 className="font-bold text-gray-900 truncate">
+                                                            {room.name}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600">
+                                                            {category.name}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <span className={`px-2 py-1 rounded text-xs font-medium ${room.status === 'waiting' ? 'bg-yellow-100 text-yellow-800' :
+                                                        room.status === 'active' ? 'bg-green-100 text-green-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                    {room.status.toUpperCase()}
+                                                </span>
+                                            </div>
+
+                                            {/* Room Stats */}
+                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                <div>
+                                                    <span className="text-gray-600">Players:</span>
+                                                    <div className="font-bold text-gray-900">
+                                                        {room.currentPlayers}/{room.maxPlayers}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-gray-600">Entry Fee:</span>
+                                                    <div className="font-bold text-gray-900">
+                                                        {room.entryFee > 0 ? `${room.entryFee} cUSD` : 'Free'}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-gray-600">Questions:</span>
+                                                    <div className="font-bold text-gray-900">
+                                                        {room.questionCount}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-gray-600">Time/Q:</span>
+                                                    <div className="font-bold text-gray-900">
+                                                        {room.timePerQuestion}s
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Prize Pool */}
+                                            {room.entryFee > 0 && (
+                                                <div className="flex items-center justify-center gap-2 p-2 bg-celo-green bg-opacity-10 rounded-lg">
+                                                    <span className="text-lg">💰</span>
+                                                    <span className="font-bold text-celo-green">
+                                                        {(room.entryFee * room.currentPlayers).toFixed(1)} cUSD Prize
                                                     </span>
                                                 </div>
+                                            )}
 
-                                                {/* Room Info */}
-                                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                                    <div>
-                                                        <span className="text-gray-500">Players:</span>
-                                                        <span className="font-medium ml-1">
-                                                            {room.players.length}/{room.maxPlayers}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-gray-500">Entry:</span>
-                                                        <span className="font-medium ml-1">
-                                                            {Number(room.entryFee) === 0 ? 'Free' : `${room.entryFee} cUSD`}
-                                                        </span>
-                                                    </div>
-                                                    <div className="col-span-2">
-                                                        <span className="text-gray-500">Created by:</span>
-                                                        <span className="font-medium ml-1">
-                                                            {formatAddress(room.creator)}
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                            {/* Join Button */}
+                                            <Button
+                                                onClick={() => joinRoom(room.id)}
+                                                disabled={!isJoinable}
+                                                variant={isJoinable ? 'primary' : 'outline'}
+                                                className="w-full"
+                                                size="sm"
+                                            >
+                                                {room.status === 'active' ? '🎮 Game in Progress' :
+                                                    room.currentPlayers >= room.maxPlayers ? '😔 Room Full' :
+                                                        room.status === 'finished' ? '✅ Game Finished' :
+                                                            '🚪 Join Room'}
+                                            </Button>
+                                        </div>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    )}
 
-                                                {/* Prize Pool */}
-                                                {Number(room.entryFee) > 0 && (
-                                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-yellow-600">💰</span>
-                                                            <span className="text-sm font-medium text-yellow-800">
-                                                                Prize Pool: {Number(room.entryFee) * room.players.length} cUSD
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Action Button */}
-                                                <Button
-                                                    onClick={() => canJoin ? joinRoom(room.id) : router.push(`/room/${room.id}`)}
-                                                    isLoading={joiningRoom === room.id}
-                                                    disabled={!canJoin && room.status !== 'active'}
-                                                    className="w-full"
-                                                    variant={canJoin ? 'primary' : 'outline'}
-                                                >
-                                                    {joiningRoom === room.id ? 'Joining...' :
-                                                        canJoin ? '🚀 Join Room' :
-                                                            room.status === 'active' ? '👀 Watch Game' :
-                                                                room.players.includes(wallet?.address || '') ? '↩️ Return to Room' :
-                                                                    '❌ Room Full'}
-                                                </Button>
-                                            </div>
-                                        </Card>
-                                    );
-                                })}
+                    {/* Stats */}
+                    <Card padding="md">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                            <div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                    {rooms.filter(r => r.status === 'waiting').length}
+                                </div>
+                                <div className="text-sm text-gray-600">Waiting Rooms</div>
                             </div>
-                        )}
-                    </div>
-
-                    {/* Back Button */}
-                    <div className="text-center">
-                        <Button
-                            variant="outline"
-                            onClick={() => router.push('/')}
-                        >
-                            ← Back to Home
-                        </Button>
-                    </div>
+                            <div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                    {rooms.filter(r => r.status === 'active').length}
+                                </div>
+                                <div className="text-sm text-gray-600">Active Games</div>
+                            </div>
+                            <div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                    {rooms.reduce((sum, room) => sum + room.currentPlayers, 0)}
+                                </div>
+                                <div className="text-sm text-gray-600">Total Players</div>
+                            </div>
+                            <div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                    {rooms.reduce((sum, room) => sum + (room.entryFee * room.currentPlayers), 0).toFixed(1)}
+                                </div>
+                                <div className="text-sm text-gray-600">Total Prizes (cUSD)</div>
+                            </div>
+                        </div>
+                    </Card>
                 </div>
             </Layout>
         </>
