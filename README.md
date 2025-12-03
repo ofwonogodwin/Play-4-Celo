@@ -105,38 +105,6 @@ npm run frontend:dev
 
 Visit `http://localhost:3000` to see the app running! 🎉
 
----
-
-## 📁 Project Structure
-
-```
-play-4-celo/
-├── contracts/              # Solidity smart contracts
-│   ├── QuizPool.sol       # Main reward pool contract
-│   └── MockERC20.sol      # Mock cUSD for testing
-├── scripts/               # Deployment and admin scripts
-│   ├── deploy.ts          # Contract deployment script
-│   └── payoutAdmin.ts     # Winner payout script
-├── test/                  # Contract tests
-│   └── QuizPool.test.ts   # Comprehensive test suite
-├── frontend/              # Next.js frontend application
-│   ├── src/
-│   │   ├── components/    # Reusable React components
-│   │   ├── pages/         # Next.js pages
-│   │   ├── styles/        # Global styles
-│   │   └── data/          # Questions dataset
-│   ├── public/            # Static assets
-│   └── package.json
-├── backend/               # Express.js backend server
-│   ├── src/
-│   │   └── server.ts      # Main server file
-│   └── package.json
-├── hardhat.config.ts      # Hardhat configuration
-├── package.json           # Root package.json
-└── README.md             # This file
-```
-
----
 
 ## 📜 Smart Contracts
 
